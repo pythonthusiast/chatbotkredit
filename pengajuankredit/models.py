@@ -10,6 +10,7 @@ class PengajuanKredit(models.Model):
     bergabung = models.DateField(max_length=225)
     waktu_kirim_pesan = models.IntegerField(max_length=225)
     jumlah_pengikut = models.IntegerField(max_length=225)
+    approve = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

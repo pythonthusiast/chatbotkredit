@@ -72,8 +72,12 @@ def cek_status_kredit(request, username):
             )
 
             if data.kepuasaan >= 90:
+                data.approve = True
+                data.save()
                 data = "Lolos, approval karena kepuasaan Anda >= 90%"
             else:
+                data.approve = False
+                data.save()
                 data = "Gagal, disapproval karena kepuasaan Anda dibawah 90%"
 
     return Response({"status": "{}".format(data),
