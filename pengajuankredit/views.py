@@ -29,6 +29,7 @@ def cek_status_kredit(request, username):
             data = 'Username ada di bukalapak, scraping in progress!'
             response = BeautifulSoup(response.text)
             #cari table data
+            TODO: ga bs pakai bs4 dari page, sptnya harus cek POST di network tab console chrome, atau selenium
             tab = response.find("table", {"class": "c-table c-table--equal c-table--tight"})
             data = tab
 
