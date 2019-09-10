@@ -27,15 +27,20 @@ def cek_status_kredit(request, username):
             data = 'Username tidak ada di bukalapak'
         elif response.status_code == 200:
             data = 'Username ada di bukalapak, scraping in progress!'
-            response = BeautifulSoup(response.text)
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            # cari merchant id
+            merchant_id = soup.find(id="merchant-page")["data-merchant-id"]
+
+            # cari auth-access-token
+            access_token = soup.find("meta", {"name": "oauth-access-token"})["content"]
+            # get data
+            url = "https://api.bukalapak.com/stores/{}?access_token={}".format(
+                merchant_id, access_token
+            )
+            response = requests.get(url)
             #cari table data
-            TODO: ga bs pakai bs4 dari page, sptnya harus cek POST di network tab console chrome, atau selenium
-            tab = response.find("table", {"class": "c-table c-table--equal c-table--tight"})
-            data = tab
-
-
-
-
+            data = response.json()
 
     return Response({"status": "{}".format(data),
                      "deskripsi": "TODO"
