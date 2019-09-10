@@ -1,4 +1,7 @@
+import re
+import datetime
 from django.shortcuts import render
+from django.utils import dateparse
 
 # Create your views here.
 from rest_framework.response import Response
@@ -41,11 +44,37 @@ def cek_status_kredit(request, username):
             response = requests.get(url)
             json_response = response.json()["data"]
 
-            data = {}
-            data["pembeli_puas"] = json_response["rejection"]
-            data["jumlah_feedback"] = json_response["reviews"]
-            data["terakhir_online"] = json_response["inactivity"]["last_appear_at"]
-            data["waktu_kirim_pesanan"] = json_response["delivery_time"]
+            # kepuasan = positive / (positive + negative) * 100
+            reviews = json_response["reviews"]
+            positive = reviews["positive"]
+            negative = reviews["negative"]
+            kepuasan = (positive / (positive + negative)) * 100 
+
+            jumlah_feedback = positive + negative
+
+            terakhir_online = dateparse.parse_datetime(json_response["inactivity"]["last_appear_at"])
+
+            bergabung = dateparse.parse_datetime(json_response["owner"]["joined_at"])
+
+            # string, ambil integernya
+            waktu_kirim_pesan = json_response["delivery_time"]
+            waktu_kirim_pesan = int(re.match(r"\d+", waktu_kirim_pesan).group())
+            jumlah_pengikut = json_response["subscriber_amount"]
+
+            data = PengajuanKredit.objects.create(
+                username=username,
+                kepuasaan=kepuasan,
+                jumlah_feedback=jumlah_feedback,
+                jumlah_pengikut=jumlah_pengikut,
+                terakhir_online=terakhir_online,
+                bergabung=bergabung,
+                waktu_kirim_pesan=waktu_kirim_pesan
+            )
+
+            if data.kepuasaan >= 90:
+                data = "Lolos, approval karena kepuasaan Anda >= 90%"
+            else:
+                data = "Gagal, disapproval karena kepuasaan Anda dibawah 90%"
 
     return Response({"status": "{}".format(data),
                      "deskripsi": "TODO"
