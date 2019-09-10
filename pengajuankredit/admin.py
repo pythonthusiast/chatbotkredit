@@ -1,5 +1,8 @@
 from django.contrib import admin
-
-# Register your models here.
 from .models import PengajuanKredit
-admin.site.register(PengajuanKredit)
+
+class PengajuanKreditAdmin(admin.ModelAdmin):
+    list_display = ('username', 'approve')
+
+
+admin.site.register(PengajuanKredit, PengajuanKreditAdmin)
