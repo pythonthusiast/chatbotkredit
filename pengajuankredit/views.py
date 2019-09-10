@@ -39,8 +39,13 @@ def cek_status_kredit(request, username):
                 merchant_id, access_token
             )
             response = requests.get(url)
-            #cari table data
-            data = response.json()
+            json_response = response.json()["data"]
+
+            data = {}
+            data["pembeli_puas"] = json_response["rejection"]
+            data["jumlah_feedback"] = json_response["reviews"]
+            data["terakhir_online"] = json_response["inactivity"]["last_appear_at"]
+            data["waktu_kirim_pesanan"] = json_response["delivery_time"]
 
     return Response({"status": "{}".format(data),
                      "deskripsi": "TODO"
